@@ -30,13 +30,13 @@ environ.Env.read_env(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env(
     "SECRET_KEY",
-    default="django-insecure-l@fwx^-z41@lmcexu(m*)($uecr=jwwbkri@0f%2ylaviny4y)",
+    default="django-insecure-l@fwx^-z41@lmcexu(m*)($uecr=jwwbkri@0f%2ylaviny4y)",  # type: ignore
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])  # type: ignore
 
 
 # Application definition
@@ -90,7 +90,7 @@ WSGI_APPLICATION = "cookie.wsgi.application"
 
 # Use PostgreSQL in production, SQLite for local dev if DATABASE_URL not set
 DATABASES = {
-    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")  # type: ignore
 }
 
 
