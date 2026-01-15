@@ -38,6 +38,10 @@ Combined, these three event types allow Cookie Trails to track troop inventory a
 
 Cookie Trails is a simple Django 6.x web app, written in Python 3.14. It presents a very basic interface to families for cookie counts, and a more advanced interface to troop cookie managers for distributions, returns, and reporting.
 
+The system can optionally generate email reminders to families when cookie counts are due. You can configure the schedule and content of these reminders to suit your troop's needs.
+
 ## Running your own instance
 
 I currently run this using [Dokku](https://dokku.com/) on a home server, with CloudFlare wrapped around it. But you could run this on Heroku's ultra-cheap tier, or any other platform that supports 12-factor web apps and offers a Postgres database. (This being Django, you can also use SQLite or MySQL if you prefer; I have not tested those configurations myself.)
+
+I personally use [Mailgun](https://www.mailgun.com/) for email delivery, but any SMTP server should work fine.
