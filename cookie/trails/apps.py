@@ -2,4 +2,6 @@ from django.apps import AppConfig
 
 
 class TrailsConfig(AppConfig):
-    name = "trails"
+    label = "trails"
+    name = "cookie.trails"
+    verbose_name = "Trails"
