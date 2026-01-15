@@ -1,0 +1,23 @@
+{
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[html][django-html][handlebars][hbs][mustache][jinja][jinja-html][nj][njk][nunjucks][twig]": {
+    "editor.defaultFormatter": "monosans.djlint",
+    "editor.formatOnSave": true
+  },
+  "python.terminal.activateEnvironment": false,
+  "python.testing.pytestArgs": ["digger"],
+  "esbonio.server.enabled": false,
+  "djlint.useVenv": true,
+  "[html]": {
+    "editor.defaultFormatter": "monosans.djlint"
+  }
+}

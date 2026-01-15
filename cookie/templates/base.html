@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}
+        CookieTrails - manage large troop cookie inventory
+      {% endblock title %}
+    </title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block extra_head %}
+    {% endblock extra_head %}
+  </head>
+  <body class="bg-gray-50">
+    {% block content %}
+    {% endblock content %}
+    {% block extra_scripts %}
+    {% endblock extra_scripts %}
+  </body>
+</html>
