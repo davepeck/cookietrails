@@ -13,7 +13,7 @@ My council purchases cookies from Little Brownie Bakers, who use the `eBudde` ap
 
 The question becomes: which "rules" &mdash; both in software and in council policy &mdash; are designed for small troops, and which are essential for all troops?
 
-In `eBudde`, when cookies are assigned to a family, it means two very different things:
+In `eBudde`, when cookies are assigned to a family, it means two very different things at the same time:
 
 1. The family is financially responsible for those cookies.
 2. The family physically possesses those cookies.
