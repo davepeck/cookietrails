@@ -28,7 +28,7 @@ In order to manage this, Cookie Trails records just three types of events:
 
 - **Distributions**: cookies moving from the troop inventory to a family
 - **Returns**: cookies moving from a family back to the troop inventory
-- **Counts**: physical counts of how many boxes of each cookie variety are currently held by the troop or a family
+- **Counts**: physical counts of how many boxes of each cookie variety are currently held by a family
 
 Distributions and returns are entered into the system as they occur, by the troop cookie managers. Counts are performed periodically by every family.
 
