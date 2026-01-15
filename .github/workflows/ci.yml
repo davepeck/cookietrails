@@ -1,0 +1,37 @@
+name: CI Tests
+
+on: [push, pull_request]
+
+jobs:
+  ci_tests:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.14
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Lint
+        run: uv run ruff check
+
+      - name: Check formatting
+        run: uv run ruff format --check
+
+      - name: Lint HTML templates
+        run: uv run djlint cookie/templates/ --lint
+
+      - name: Check HTML template formatting
+        run: uv run djlint cookie/templates/ --check
+
+      - name: Type check
+        run: uv run ty check
+
+      - name: Run tests
+        run: uv run python manage.py test
