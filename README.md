@@ -32,7 +32,7 @@ In order to manage this, Cookie Trails records just three types of events:
 
 Distributions and returns are entered into the system as they occur, by the troop cookie managers. Counts are performed periodically by every family.
 
-Combined, these three event types allow Cookie Trails to track troop inventory accurately without requiring all troop-assigned cookies to be in a single location. Specifically, when a family reports a count N of a cookie variety, Cookie Trails can see that the family is _personally_ repsonsible for M boxes of that variety. If N > M, then the family has extra boxes that must have come from the troop inventory.
+Combined, these three event types allow Cookie Trails to track troop inventory accurately without requiring all troop-assigned cookies to be in a single location. Specifically, when a family reports a count N of a cookie variety, Cookie Trails can see (via `eBudde`) that the family is _personally_ repsonsible for M boxes of that variety. If N > M, then the family has extra boxes that must have come from the troop inventory.
 
 ## What is this, technically?
 
