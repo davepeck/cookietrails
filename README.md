@@ -6,14 +6,14 @@ Cookie inventory management tools for large Girl Scout troops.
 
 Generally speaking, all Girl Scout troops nationwide use two pieces of software:
 
-- Digital Cookie, a web application for customers to order cookies online
-- _Either_ eBudde _or_ Smart Cookies, mobile apps for troop leaders to manage cookie inventory and orders
+- `Digital Cookie`, an online storefront for customers to place cookie orders, and for families to manage their individual sales
+- _Either_ `eBudde` _or_ `Smart Cookies`, back-office web apps for troop leaders to manage cookie inventory and orders
 
-My council purchases cookies from Little Brownie Bakers, who use the eBudde app. Alas: eBudde (and the cookie selling best practices it attempts to enforce) is designed for small troops of fewer than 10 girls. My troop has 50.
+My council purchases cookies from Little Brownie Bakers, who use the `eBudde` app. Alas: `eBudde` (and the cookie selling best practices it attempts to enforce) is designed for small troops of fewer than 10 girls. My troop has 50.
 
 The question becomes: which "rules" &mdash; both in software and in council policy &mdash; are designed for small troops, and which are essential for all troops?
 
-In eBudde, when cookies are assigned to a family, it means two very different things:
+In `eBudde`, when cookies are assigned to a family, it means two very different things:
 
 1. The family is financially responsible for those cookies.
 2. The family physically possesses those cookies.
