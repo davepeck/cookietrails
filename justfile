@@ -22,7 +22,7 @@ type_check:
     uv run ty check
 
 test:
-    uv run python manage.py test
+    uv run pytest
 
 squash:
     rm -f cookie/trails/migrations/0*.py

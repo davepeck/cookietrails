@@ -13,7 +13,14 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["django-stubs>=5.2.8", "djlint>=1.36.4", "ruff>=0.14.11", "ty>=0.0.12"]
+dev = [
+    "django-stubs>=5.2.8",
+    "djlint>=1.36.4",
+    "pytest>=9.0.2",
+    "pytest-django>=4.11.1",
+    "ruff>=0.14.11",
+    "ty>=0.0.12",
+]
 
 [tool.ruff]
 extend-exclude = ["*/migrations/*", ".venv/*"]
@@ -27,3 +34,8 @@ ignore = "H006,H030,H031"
 
 [tool.ty.rules]
 unused-ignore-comment = "ignore"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "cookie.settings"
+testpaths = ["cookie"]
+python_files = ["*_tests.py", "tests.py"]
