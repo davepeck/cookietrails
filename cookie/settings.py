@@ -70,7 +70,7 @@ ROOT_URLCONF = "cookie.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "cookies" / "templates"],
+        "DIRS": [BASE_DIR / "cookie" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

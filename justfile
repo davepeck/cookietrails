@@ -33,3 +33,5 @@ squash:
 runserver:
     uv run python manage.py runserver
 
+super:
+    uv run python manage.py createsuperuser
