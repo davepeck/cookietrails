@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     "django_browser_reload",
     "django_htmx",
     "cookie.trails",
@@ -83,6 +84,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "cookie.wsgi.application"
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 
 # Database

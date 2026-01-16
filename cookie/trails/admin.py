@@ -2,11 +2,13 @@ from typing import Any
 
 from django.contrib import admin
 from django.contrib.admin.decorators import display
+from django.db import models
 from django.http import HttpRequest
 
 from cookie.admin import admin_site
 
 from .cookies import COOKIE_COLORS, CookieVariety
+from .forms import CookieCountWidget
 from .models import Event, Family
 
 
@@ -44,6 +46,10 @@ class EventAdmin(admin.ModelAdmin):
         *[make_variety_column(v) for v in CookieVariety],
         "total",
     ]
+
+    formfield_overrides = {
+        models.JSONField: {"widget": CookieCountWidget},
+    }
 
     def changelist_view(self, request: HttpRequest, extra_context: dict | None = None):
         extra_context = extra_context or {}

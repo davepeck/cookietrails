@@ -1,0 +1,52 @@
+<style>
+  .cookie-count-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cookie-count-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .cookie-count-label {
+    color: black;
+    display: block;
+    padding: 12px 12px !important;
+    border-radius: 4px 0 0 4px;
+    font-weight: bold;
+    font-size: 12px;
+    min-width: 100px;
+    text-align: left;
+  }
+  .cookie-count-input {
+    width: 90px;
+    text-align: right;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 0 4px 4px 0;
+    padding: 4px 10px !important;
+  }
+  {% for variety in varieties %}
+  .cookie-count-label-{{ variety.key }} {
+    background-color: {{ variety.color }};
+  }
+  .cookie-count-input-{{ variety.key }} {
+    border-color: {{ variety.color }};
+  }
+  {% endfor %}
+</style>
+<div class="cookie-count-container">
+  {% for variety in varieties %}
+    <div class="cookie-count-item">
+      <label for="{{ widget.name }}_{{ variety.key }}"
+             class="cookie-count-label cookie-count-label-{{ variety.key }}">{{ variety.label }}</label>
+      <input type="number"
+             name="{{ widget.name }}_{{ variety.key }}"
+             id="{{ widget.name }}_{{ variety.key }}"
+             value="{{ variety.value }}"
+             min="0"
+             class="cookie-count-input cookie-count-input-{{ variety.key }}">
+    </div>
+  {% endfor %}
+</div>
