@@ -3,6 +3,15 @@
   <div class="h-dvh flex flex-col items-center justify-center">
     <div class="-mt-12">
       <h1 class="text-4xl font-bold">Report Your Inventory</h1>
+      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <p class="text-gray-700">
+          Signed in as <span class="font-semibold">{{ current_family.scout_name }}</span>
+          (grade: {{ current_family.grade }})
+          &lt;{{ current_family.email }}&gt;
+        </p>
+        <a href="{% url 'family_logout' %}"
+           class="text-sm underline text-blue-500 hover:text-blue-900 transition">Sign out</a>
+      </div>
       <p class="mt-8 text-gray-600">Coming soon...</p>
       <div class="mt-8">
         <a href="{% url 'home' %}"
