@@ -33,11 +33,16 @@ def _default_count_data() -> dict[str, int]:
 
 
 class Event(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    event_type = models.CharField(max_length=20, choices=EventType.choices)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    event_type = models.CharField(
+        max_length=20, choices=EventType.choices, db_index=True
+    )
     family = models.ForeignKey(Family, on_delete=models.PROTECT, related_name="events")
     updated_at = models.DateTimeField(auto_now=True)
     count_data = models.JSONField(default=_default_count_data)
+
+    class Meta:
+        ordering = ["created_at"]
 
     @property
     def counts(self) -> dict[CookieVariety, int]:

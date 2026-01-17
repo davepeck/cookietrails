@@ -12,18 +12,22 @@ from .forms import CookieCountWidget
 from .models import Event, Family
 
 
-class EventInline(admin.TabularInline):
-    model = Event
-    extra = 0
-    fields = ("created_at", "event_type")
-    readonly_fields = ("created_at",)
-    show_change_link = True
-
-
 class FamilyAdmin(admin.ModelAdmin):
     list_display = ("scout_name", "grade", "email")
     search_fields = ("scout_name", "email")
-    inlines = [EventInline]
+
+    def change_view(
+        self,
+        request: HttpRequest,
+        object_id: str,
+        form_url: str = "",
+        extra_context: dict | None = None,
+    ):
+        extra_context = extra_context or {}
+        extra_context["cookie_varieties"] = [
+            {"value": v.value, "color": COOKIE_COLORS[v]} for v in CookieVariety
+        ]
+        return super().change_view(request, object_id, form_url, extra_context)
 
 
 admin_site.register(Family, FamilyAdmin)
@@ -46,6 +50,8 @@ class EventAdmin(admin.ModelAdmin):
         *[make_variety_column(v) for v in CookieVariety],
         "total",
     ]
+    ordering = ["created_at"]
+    # list_filter = ["event_type"]
 
     formfield_overrides = {
         models.JSONField: {"widget": CookieCountWidget},

@@ -33,5 +33,8 @@ squash:
 runserver:
     uv run python manage.py runserver
 
+families:
+    uv run python manage.py loaddata data/families.json
+
 super:
     uv run python manage.py createsuperuser
