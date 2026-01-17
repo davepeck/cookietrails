@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Cookie Calculator - CookieTrails
+{% endblock title %}
+
+{% block content %}
+  <div class="min-h-dvh bg-gray-50 py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Cookie Calculator</h1>
+
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <label for="total-boxes" class="block text-sm font-medium text-gray-700 mb-2">
+          Target number of boxes
+        </label>
+        <input
+          type="number"
+          id="total-boxes"
+          min="0"
+          value="100"
+          class="w-full px-4 py-3 text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+          oninput="updateDistribution()"
+        />
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Ideal Distribution</h2>
+        <div id="distribution-results" class="space-y-3">
+        </div>
+        <div id="total-cost" class="mt-6 pt-4 border-t border-gray-200 text-right">
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block extra_scripts %}
+  <script>
+    /**
+     * Determine if a color is light (needs dark text) or dark (needs light text)
+     * @param {string} hexColor - Hex color code
+     * @returns {boolean} True if the color is light
+     */
+    function isLightColor(hexColor) {
+      const hex = hexColor.replace("#", "");
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5;
+    }
+
+    /**
+     * Update the distribution display based on input
+     */
+    function updateDistribution() {
+      const input = document.getElementById("total-boxes");
+      const resultsDiv = document.getElementById("distribution-results");
+      const totalCostDiv = document.getElementById("total-cost");
+
+      const totalBoxes = parseInt(input.value) || 0;
+
+      if (totalBoxes <= 0) {
+        resultsDiv.innerHTML =
+          '<p class="text-gray-500 text-center py-4">Enter a number of boxes to see the distribution</p>';
+        totalCostDiv.innerHTML = "";
+        return;
+      }
+
+      const distribution = calculateDistribution(totalBoxes);
+      const totalCost = calculateCookieCost(distribution);
+
+      let html = "";
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const count = distribution[variety];
+        const label = getCookieLabel(variety);
+        const color = getCookieColor(variety);
+        const textColor = isLightColor(color) ? "text-gray-800" : "text-white";
+        const percentage = ((count / totalBoxes) * 100).toFixed(1);
+
+        html += `
+          <div class="flex items-center gap-4">
+            <div
+              class="w-36 py-2 px-3 rounded-lg font-medium ${textColor} text-sm truncate"
+              style="background-color: ${color};"
+            >
+              ${label}
+            </div>
+            <div class="flex-1 bg-gray-100 rounded-full h-8 overflow-hidden">
+              <div
+                class="h-full flex items-center justify-end pr-3 text-sm font-medium ${textColor} transition-all duration-300"
+                style="width: ${percentage}%; background-color: ${color}; min-width: ${count > 0 ? "3rem" : "0"};"
+              >
+                ${count > 0 ? count : ""}
+              </div>
+            </div>
+            <div class="w-16 text-right text-sm text-gray-500">
+              ${percentage}%
+            </div>
+          </div>
+        `;
+      }
+
+      resultsDiv.innerHTML = html;
+      totalCostDiv.innerHTML = `
+        <span class="text-gray-600">Total cost:</span>
+        <span class="text-2xl font-bold text-gray-800 ml-2">$${totalCost.toFixed(2)}</span>
+      `;
+    }
+
+    // Initialize on page load
+    document.addEventListener("DOMContentLoaded", updateDistribution);
+  </script>
+{% endblock extra_scripts %}
