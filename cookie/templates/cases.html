@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}
+  Case Calculator - CookieTrails
+{% endblock title %}
+{% block content %}
+  <div class="min-h-dvh bg-gray-50 py-6 sm:py-12 px-3 sm:px-4">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-8 text-center">Case Calculator</h1>
+      <p class="text-gray-600 text-center mb-6">Enter the number of boxes you want for each variety, and we'll tell you how many cases to order.</p>
+      <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-8">
+        <div class="space-y-3 sm:space-y-4" id="box-inputs"></div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+        <h2 class="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Suggested Cases</h2>
+        <div id="case-results" class="space-y-2 sm:space-y-3"></div>
+        <div id="totals" class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200"></div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+{% block extra_scripts %}
+  <script>
+    /**
+     * Determine if a color is light (needs dark text) or dark (needs light text)
+     * @param {string} hexColor - Hex color code
+     * @returns {boolean} True if the color is light
+     */
+    function isLightColor(hexColor) {
+      const hex = hexColor.replace("#", "");
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5;
+    }
+
+    /**
+     * Build the input form
+     */
+    function buildInputs() {
+      const inputsDiv = document.getElementById("box-inputs");
+      let html = "";
+
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const label = getCookieLabel(variety);
+        const shortLabel = getCookieLabelShort(variety);
+        const color = getCookieColor(variety);
+        const textColor = isLightColor(color) ? "text-gray-800" : "text-white";
+
+        html += `
+          <div class="flex items-center gap-2 sm:gap-4">
+            <div class="w-20 sm:w-36 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg font-medium ${textColor} text-xs sm:text-sm truncate" style="background-color: ${color};">
+              <span class="sm:hidden">${shortLabel}</span>
+              <span class="hidden sm:inline">${label}</span>
+            </div>
+            <input type="number"
+                   id="boxes-${variety}"
+                   data-variety="${variety}"
+                   min="0"
+                   value="0"
+                   class="box-input flex-1 px-3 py-2 text-base sm:text-lg font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                   oninput="updateCases()" />
+            <span class="w-12 text-xs sm:text-sm text-gray-500 text-right">boxes</span>
+          </div>
+        `;
+      }
+
+      inputsDiv.innerHTML = html;
+    }
+
+    /**
+     * Update the case suggestions based on inputs
+     */
+    function updateCases() {
+      const resultsDiv = document.getElementById("case-results");
+      const totalsDiv = document.getElementById("totals");
+
+      // Gather box counts from inputs
+      const boxes = {};
+      let totalRequestedBoxes = 0;
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const input = document.getElementById(`boxes-${variety}`);
+        const value = parseInt(input.value) || 0;
+        boxes[variety] = value;
+        totalRequestedBoxes += value;
+      }
+
+      if (totalRequestedBoxes === 0) {
+        resultsDiv.innerHTML =
+          '<p class="text-gray-500 text-center py-4">Enter box counts above to see case suggestions</p>';
+        totalsDiv.innerHTML = "";
+        return;
+      }
+
+      const cases = calculateCases(boxes);
+
+      let html = "";
+      let totalCases = 0;
+      let totalActualBoxes = 0;
+
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const requestedBoxes = boxes[variety];
+        const numCases = cases[variety];
+        const actualBoxes = numCases * BOXES_PER_CASE;
+        const diff = actualBoxes - requestedBoxes;
+
+        totalCases += numCases;
+        totalActualBoxes += actualBoxes;
+
+        const label = getCookieLabel(variety);
+        const shortLabel = getCookieLabelShort(variety);
+        const color = getCookieColor(variety);
+        const textColor = isLightColor(color) ? "text-gray-800" : "text-white";
+
+        // Build the diff text
+        let diffText = "";
+        if (diff > 0) {
+          diffText = `<span class="text-green-600 text-xs sm:text-sm">${diff} more</span>`;
+        } else if (diff < 0) {
+          diffText = `<span class="text-red-600 text-xs sm:text-sm">${Math.abs(diff)} under</span>`;
+        }
+
+        html += `
+          <div class="flex items-center gap-2 sm:gap-4">
+            <div class="w-20 sm:w-36 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg font-medium ${textColor} text-xs sm:text-sm truncate" style="background-color: ${color};">
+              <span class="sm:hidden">${shortLabel}</span>
+              <span class="hidden sm:inline">${label}</span>
+            </div>
+            <div class="flex-1 flex items-center gap-2">
+              <span class="text-lg sm:text-xl font-bold text-gray-800">${numCases}</span>
+              <span class="text-gray-500 text-sm">${numCases === 1 ? "case" : "cases"}</span>
+              <span class="text-gray-400 text-xs sm:text-sm">(${actualBoxes} boxes)</span>
+              ${diffText}
+            </div>
+          </div>
+        `;
+      }
+
+      resultsDiv.innerHTML = html;
+
+      const totalDiff = totalActualBoxes - totalRequestedBoxes;
+      let totalDiffText = "";
+      if (totalDiff > 0) {
+        totalDiffText = `<span class="text-green-600">${totalDiff} more</span>`;
+      } else if (totalDiff < 0) {
+        totalDiffText = `<span class="text-red-600">${Math.abs(totalDiff)} under</span>`;
+      }
+
+      const totalCost = calculateCookieCost(
+        Object.fromEntries(
+          VARIETIES_BY_POPULARITY.map((v) => [v, cases[v] * BOXES_PER_CASE])
+        )
+      );
+
+      totalsDiv.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-4">
+          <div>
+            <span class="text-gray-600">Total cases:</span>
+            <span class="text-xl font-bold text-gray-800 ml-2">${totalCases}</span>
+          </div>
+          <div>
+            <span class="text-gray-600">Total boxes:</span>
+            <span class="text-xl font-bold text-gray-800 ml-2">${totalActualBoxes}</span>
+            ${totalDiffText ? `<span class="ml-2">${totalDiffText}</span>` : ""}
+          </div>
+          <div>
+            <span class="text-gray-600">Total cost:</span>
+            <span class="text-xl font-bold text-gray-800 ml-2">$${totalCost.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Initialize on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      buildInputs();
+      updateCases();
+    });
+  </script>
+{% endblock extra_scripts %}
