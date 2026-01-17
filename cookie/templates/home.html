@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="h-dvh flex flex-col items-center justify-center">
-    <h1 class="text-4xl font-bold -mt-16">CookieTrails</h1>
-    <div class="mt-16 flex gap-4">
-      <a href="{% url 'calculator' %}"
-         class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-900 transition">Box Distribution</a>
-      <a href="{% url 'cases' %}"
-         class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-900 transition">Case Suggestions</a>
+    <div class="-mt-12">
+      <h1 class="text-4xl font-bold">CookieTrails</h1>
+      <div class="mt-8 flex flex-col gap-4">
+        <a href="{% url 'calculator' %}"
+           class="pointer rounded-md bg-blue-600 hover:bg-blue-900 text-white text-xl transition p-4">Report your inventory</a>
+      </div>
+      <div class="mt-16 flex flex-col gap-4">
+        <h3 class="text-xl font-bold text-gray-600">Utilities</h3>
+        <a href="{% url 'calculator' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box Calculator</a>
+        <a href="{% url 'cases' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Case Suggestions</a>
+        <a href="{% url 'admin:login' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Admin access</a>
+      </div>
     </div>
   </div>
 {% endblock content %}
