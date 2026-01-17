@@ -5,7 +5,7 @@ from django.db import models
 
 class CookieVariety(models.TextChoices):
     ADVENTUREFULS = "Advf", "Adventurefuls"
-    LEMON_UPS = "Lmup", "Lemon-Ups"
+    LEMON_UPS = "Lmup", "Lemon-ups"
     TREFOILS = "Tre", "Trefoils"
     DO_SI_DOS = "D-S-D", "Do-si-dos"
     SAMOAS = "Sam", "Samoas"

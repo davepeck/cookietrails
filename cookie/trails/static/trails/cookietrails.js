@@ -19,7 +19,7 @@
  */
 const CookieVariety = Object.freeze({
   Advf: "Adventurefuls",
-  Lmup: "Lemon-Ups",
+  Lmup: "Lemon-ups",
   Tre: "Trefoils",
   "D-S-D": "Do-si-dos",
   Sam: "Samoas",
