@@ -11,3 +11,7 @@ class CalculatorView(TemplateView):
 
 class CasesView(TemplateView):
     template_name = "cases.html"
+
+
+class CountView(TemplateView):
+    template_name = "count.html"

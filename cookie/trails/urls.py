@@ -1,9 +1,10 @@
 from django.urls import path
 
-from .views import CalculatorView, CasesView, HomeView
+from .views import CalculatorView, CasesView, CountView, HomeView
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("calc/", CalculatorView.as_view(), name="calculator"),
     path("cases/", CasesView.as_view(), name="cases"),
+    path("events/count/", CountView.as_view(), name="count"),
 ]
