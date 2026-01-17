@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}
-  Cookie Calculator - CookieTrails
+  Box Distribution - CookieTrails
 {% endblock title %}
 {% block content %}
   <div class="min-h-dvh bg-gray-50 py-6 sm:py-12 px-3 sm:px-4">
     <div class="max-w-2xl mx-auto">
-      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-8 text-center">Cookie Calculator</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-8 text-center">Box Distribution</h1>
       <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-8">
         <label for="total-boxes"
                class="block text-sm font-medium text-gray-700 mb-2">Target number of boxes</label>
@@ -20,7 +20,8 @@
       <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
         <h2 class="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Suggested Distribution</h2>
         <div id="distribution-results" class="space-y-2 sm:space-y-3"></div>
-        <div id="total-cost" class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 text-right"></div>
+        <div id="total-cost"
+             class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 text-right"></div>
       </div>
     </div>
   </div>
@@ -90,7 +91,7 @@
 
       resultsDiv.innerHTML = html;
       totalCostDiv.innerHTML = `
-        <span class="text-gray-600">Total cost:</span>
+        <span class="text-gray-600">Total value:</span>
         <span class="text-2xl font-bold text-gray-800 ml-2">$${totalCost.toFixed(2)}</span>
       `;
     }
