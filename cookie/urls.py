@@ -19,8 +19,10 @@ from django.conf import settings
 from django.urls import include, path
 
 from .admin import admin_site
+from .trails.views import HomeView
 
 urlpatterns = [
+    path("", HomeView.as_view(), name="home"),
     path("admin/", admin_site.urls),
 ]
 
