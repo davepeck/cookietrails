@@ -13,9 +13,20 @@
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box Calculator</a>
         <a href="{% url 'cases' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Case Suggestions</a>
-        <a href="{% url 'admin:login' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Admin access</a>
+        {% if not user.is_staff %}
+          <a href="{% url 'admin:login' %}"
+             class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Admin access</a>
+        {% endif %}
       </div>
+      {% if user.is_staff %}
+        <div class="mt-16 flex flex-col gap-4">
+          <h3 class="text-xl font-bold text-gray-600">Admin tools</h3>
+          <a href="{% url 'admin:trails_family_changelist' %}"
+             class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Families list</a>
+          <a href="{% url 'admin:trails_event_changelist' %}"
+             class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Events list</a>
+        </div>
+      {% endif %}
     </div>
   </div>
 {% endblock content %}

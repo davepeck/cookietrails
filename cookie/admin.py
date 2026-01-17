@@ -6,7 +6,8 @@ from django.contrib.auth.models import Group, User
 class CookieTrailsAdminSite(admin.AdminSite):
     site_header = "Cookie Trails Admin"
     site_title = "Cookie Trails Admin"
-    index_title = "Cookie Trails Admin"
+    index_title = "Cookie Trails Admin Home"
+    site_url = "/"
     enable_nav_sidebar = False
 
 

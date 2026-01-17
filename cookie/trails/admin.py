@@ -15,6 +15,7 @@ from .models import Event, Family
 class FamilyAdmin(admin.ModelAdmin):
     list_display = ("scout_name", "grade", "email")
     search_fields = ("scout_name", "email")
+    search_help_text = "Search by scout name or parent email"
 
     def change_view(
         self,
@@ -51,6 +52,8 @@ class EventAdmin(admin.ModelAdmin):
         "total",
     ]
     ordering = ["created_at"]
+    search_fields = ["family__scout_name", "family__email"]
+    search_help_text = "Search by scout name or parent email"
     # list_filter = ["event_type"]
 
     formfield_overrides = {

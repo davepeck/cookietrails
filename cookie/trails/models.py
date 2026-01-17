@@ -4,8 +4,8 @@ from .cookies import CookieVariety
 
 
 class Family(models.Model):
-    scout_name = models.CharField(max_length=100)
-    email = models.EmailField()
+    scout_name = models.CharField(max_length=100, db_index=True)
+    email = models.EmailField(db_index=True)
     grade = models.PositiveSmallIntegerField()
 
     class Meta:
