@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     CalculatorView,
     CasesView,
+    CountSuccessView,
     CountView,
     FamilyLoginView,
     FamilyLogoutView,
@@ -14,6 +15,11 @@ urlpatterns = [
     path("calc/", CalculatorView.as_view(), name="calculator"),
     path("cases/", CasesView.as_view(), name="cases"),
     path("events/count/", CountView.as_view(), name="count"),
+    path(
+        "events/count/<int:event_id>/success/",
+        CountSuccessView.as_view(),
+        name="count_success",
+    ),
     path("family/login/", FamilyLoginView.as_view(), name="family_login"),
     path("family/logout/", FamilyLogoutView.as_view(), name="family_logout"),
 ]
