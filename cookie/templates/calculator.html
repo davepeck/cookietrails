@@ -3,10 +3,10 @@
   Cookie Calculator - CookieTrails
 {% endblock title %}
 {% block content %}
-  <div class="min-h-dvh bg-gray-50 py-12 px-4">
+  <div class="min-h-dvh bg-gray-50 py-6 sm:py-12 px-3 sm:px-4">
     <div class="max-w-2xl mx-auto">
-      <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Cookie Calculator</h1>
-      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-8 text-center">Cookie Calculator</h1>
+      <div class="bg-white rounded-xl shadow-md p-4 sm:p-6 mb-4 sm:mb-8">
         <label for="total-boxes"
                class="block text-sm font-medium text-gray-700 mb-2">Target number of boxes</label>
         <input type="number"
@@ -14,13 +14,13 @@
                min="0"
                step="10"
                value="100"
-               class="w-full px-4 py-3 text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+               class="w-full px-4 py-2 sm:py-3 text-xl sm:text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
                oninput="updateDistribution()" />
       </div>
-      <div class="bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-4">Suggested Distribution</h2>
-        <div id="distribution-results" class="space-y-3"></div>
-        <div id="total-cost" class="mt-6 pt-4 border-t border-gray-200 text-right"></div>
+      <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+        <h2 class="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Suggested Distribution</h2>
+        <div id="distribution-results" class="space-y-2 sm:space-y-3"></div>
+        <div id="total-cost" class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 text-right"></div>
       </div>
     </div>
   </div>
@@ -65,21 +65,23 @@
       for (const variety of VARIETIES_BY_POPULARITY) {
         const count = distribution[variety];
         const label = getCookieLabel(variety);
+        const shortLabel = getCookieLabelShort(variety);
         const color = getCookieColor(variety);
         const textColor = isLightColor(color) ? "text-gray-800" : "text-white";
         const percentage = ((count / totalBoxes) * 100).toFixed(1);
 
         html += `
-          <div class="flex items-center gap-4">
-            <div class="w-36 py-2 px-3 rounded-lg font-medium ${textColor} text-sm truncate" style="background-color: ${color};">
-              ${label}
+          <div class="flex items-center gap-2 sm:gap-4">
+            <div class="w-16 sm:w-36 py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg font-medium ${textColor} text-xs sm:text-sm truncate" style="background-color: ${color};">
+              <span class="sm:hidden">${shortLabel}</span>
+              <span class="hidden sm:inline">${label}</span>
             </div>
-            <div class="flex-1 bg-gray-100 rounded-full h-8 overflow-hidden">
-              <div class="h-full flex items-center justify-end pr-3 text-sm font-medium ${textColor} transition-all duration-300" style="width: ${percentage}%; background-color: ${color}; min-width: ${count > 0 ? "3rem" : "0"};">
+            <div class="flex-1 bg-gray-100 rounded-full h-6 sm:h-8 overflow-hidden">
+              <div class="h-full flex items-center justify-end pr-2 sm:pr-3 text-xs sm:text-sm font-medium ${textColor} transition-all duration-300" style="width: ${percentage}%; background-color: ${color}; min-width: ${count > 0 ? "2.5rem" : "0"};">
                 ${count > 0 ? count : ""}
               </div>
             </div>
-            <div class="w-16 text-right text-sm text-gray-500">
+            <div class="w-10 sm:w-14 text-right text-xs sm:text-sm text-gray-500">
               ${percentage}%
             </div>
           </div>

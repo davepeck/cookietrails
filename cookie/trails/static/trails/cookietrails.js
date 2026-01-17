@@ -30,6 +30,23 @@ const CookieVariety = Object.freeze({
 });
 
 /**
+ * Short names for cookie varieties (for mobile/compact displays)
+ * Uses the variety codes directly
+ * @type {Object<CookieVarietyCode, string>}
+ */
+const CookieVarietyShort = Object.freeze({
+  Advf: "Advf",
+  Lmup: "Lmup",
+  Tre: "Tre",
+  "D-S-D": "D-S-D",
+  Sam: "Sam",
+  Tags: "Tags",
+  TMint: "TMint",
+  Exp: "Exp",
+  Toff: "Toff",
+});
+
+/**
  * All valid cookie variety codes
  * @type {CookieVarietyCode[]}
  */
@@ -184,6 +201,15 @@ function calculateCases(boxes, threshold = CASE_THRESHOLD) {
  */
 function getCookieLabel(code) {
   return CookieVariety[code] ?? code;
+}
+
+/**
+ * Get the short label for a cookie variety code (for compact displays)
+ * @param {CookieVarietyCode} code - The variety code
+ * @returns {string} The short label (variety code)
+ */
+function getCookieLabelShort(code) {
+  return CookieVarietyShort[code] ?? code;
 }
 
 /**
