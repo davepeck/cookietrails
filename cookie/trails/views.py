@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -12,6 +13,27 @@ from .family_auth import (
     set_current_family,
 )
 from .models import Event, EventType, Family
+
+
+def _build_varieties_list():
+    """Build cookie varieties list in popularity order with colors."""
+    varieties = []
+    for variety_code in COOKIE_POPULARITY.keys():
+        cookie = CookieVariety(variety_code)
+        color = COOKIE_COLORS.get(cookie, "#CCCCCC")
+        hex_color = color.lstrip("#")
+        r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+        luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        text_dark = luminance > 0.5
+        varieties.append(
+            {
+                "code": variety_code,
+                "label": cookie.label,
+                "color": color,
+                "text_dark": text_dark,
+            }
+        )
+    return varieties
 
 
 class HomeView(TemplateView):
@@ -165,3 +187,86 @@ class FamilyLogoutView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         clear_current_family(request)
         return redirect("home")
+
+
+@method_decorator(staff_member_required, name="dispatch")
+class AdminEventView(TemplateView):
+    template_name = "admin_event.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["varieties"] = _build_varieties_list()
+        context["families"] = Family.objects.all().order_by("scout_name")
+        context["event_types"] = [
+            {
+                "value": EventType.PICKUP,
+                "label": "Pickup (troop → family)",
+                "description": "Family takes cookies from troop inventory",
+            },
+            {
+                "value": EventType.RETURN,
+                "label": "Return (family → troop)",
+                "description": "Family returns cookies to troop inventory",
+            },
+        ]
+        return context
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        family_id = request.POST.get("family")
+        event_type = request.POST.get("event_type")
+
+        # Validate family
+        try:
+            family = Family.objects.get(pk=family_id)
+        except (Family.DoesNotExist, ValueError):
+            return redirect("admin_event")
+
+        # Validate event type
+        if event_type not in (EventType.PICKUP, EventType.RETURN):
+            return redirect("admin_event")
+
+        # Collect count data from form
+        count_data = {}
+        for variety in CookieVariety:
+            value = request.POST.get(f"count_{variety.value}", "0")
+            try:
+                count_data[variety.value] = int(value) if value else 0
+            except ValueError:
+                count_data[variety.value] = 0
+
+        # Create the event
+        event = Event.objects.create(
+            family=family,
+            event_type=event_type,
+            count_data=count_data,
+        )
+
+        return redirect("admin_event_success", event_id=event.pk)
+
+
+@method_decorator(staff_member_required, name="dispatch")
+class AdminEventSuccessView(TemplateView):
+    template_name = "admin_event_success.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        event_id = self.kwargs.get("event_id")
+
+        try:
+            event = Event.objects.get(pk=event_id)
+        except Event.DoesNotExist:
+            context["event"] = None
+            return context
+
+        # Build cookie varieties list with submitted counts
+        varieties = _build_varieties_list()
+        total = 0
+        for variety in varieties:
+            count = event.count_data.get(variety["code"], 0)
+            variety["count"] = count
+            total += count
+
+        context["event"] = event
+        context["varieties"] = varieties
+        context["total"] = total
+        return context
