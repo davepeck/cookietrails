@@ -93,6 +93,7 @@ TEMPLATES = [
     },
 ]
 
+# Rebuild, please.
 WSGI_APPLICATION = "cookie.wsgi.application"
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
