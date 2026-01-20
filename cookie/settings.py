@@ -39,9 +39,17 @@ DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])  # type: ignore
 
 
+BASE_URL: str = env("BASE_URL", default="http://localhost:8000")  # type: ignore
+ORIGIN = BASE_URL.replace("http://", "").replace("https://", "").split(":")[0]
+CSRF_TRUSTED_ORIGINS = [BASE_URL]
+ALLOWED_HOSTS = [ORIGIN, "localhost", "127.0.0.1"]
+INTERNAL_IPS = ["127.0.0.1"]
+
+
 # Application definition
 
 INSTALLED_APPS = [
+    "servestatic.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -56,6 +64,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "servestatic.middleware.ServeStaticMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -132,6 +141,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+STATICFILES_DIRS = [BASE_DIR / "cookie" / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "static/"
+
+# Enable ServeStatic's GZip compression of static assets.
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "servestatic.storage.CompressedManifestStaticFilesStorage"
+    }
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
