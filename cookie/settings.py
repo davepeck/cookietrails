@@ -158,3 +158,18 @@ STORAGES = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Email configuration
+
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # type: ignore
+EMAIL_PORT = env.int("EMAIL_PORT", default=25)  # type: ignore
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")  # type: ignore
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")  # type: ignore
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)  # type: ignore
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)  # type: ignore
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.console.EmailBackend",  # type: ignore
+)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="admin@cookietrails.org")  # type: ignore
