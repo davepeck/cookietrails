@@ -15,8 +15,13 @@ from .family_auth import (
 from .models import Event, EventType, Family
 
 
-def _build_varieties_list():
-    """Build cookie varieties list in popularity order with colors."""
+def _build_varieties_list(
+    count_data: dict[str, int] | None = None, count_key: str = "count"
+):
+    """Build cookie varieties list in popularity order with colors.
+
+    If count_data is provided, adds values under the specified count_key.
+    """
     varieties = []
     for variety_code in COOKIE_POPULARITY.keys():
         cookie = CookieVariety(variety_code)
@@ -25,15 +30,28 @@ def _build_varieties_list():
         r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
         luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
         text_dark = luminance > 0.5
-        varieties.append(
-            {
-                "code": variety_code,
-                "label": cookie.label,
-                "color": color,
-                "text_dark": text_dark,
-            }
-        )
+        variety = {
+            "code": variety_code,
+            "label": cookie.label,
+            "color": color,
+            "text_dark": text_dark,
+        }
+        if count_data is not None:
+            variety[count_key] = count_data.get(variety_code, 0)
+        varieties.append(variety)
     return varieties
+
+
+def _parse_count_data(post_data) -> dict[str, int]:
+    """Parse cookie count data from POST request."""
+    count_data = {}
+    for variety in CookieVariety:
+        value = post_data.get(f"count_{variety.value}", "0")
+        try:
+            count_data[variety.value] = int(value) if value else 0
+        except ValueError:
+            count_data[variety.value] = 0
+    return count_data
 
 
 class HomeView(TemplateView):
@@ -63,30 +81,8 @@ class CountView(TemplateView):
             .first()
         )
 
-        # Build cookie varieties list in popularity order with colors
-        varieties = []
-        for variety in COOKIE_POPULARITY.keys():
-            cookie = CookieVariety(variety)
-            color = COOKIE_COLORS.get(cookie, "#CCCCCC")
-            # Calculate luminance to determine text color
-            hex_color = color.lstrip("#")
-            r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
-            luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-            text_dark = luminance > 0.5
-
-            last_value = last_count.count_data.get(variety, 0) if last_count else 0
-
-            varieties.append(
-                {
-                    "code": variety,
-                    "label": cookie.label,
-                    "color": color,
-                    "text_dark": text_dark,
-                    "last_value": last_value,
-                }
-            )
-
-        context["varieties"] = varieties
+        last_data = last_count.count_data if last_count else None
+        context["varieties"] = _build_varieties_list(last_data, "last_value")
         context["has_previous"] = last_count is not None
         return context
 
@@ -95,20 +91,10 @@ class CountView(TemplateView):
         if not family:
             return redirect("family_login")
 
-        # Collect count data from form
-        count_data = {}
-        for variety in CookieVariety:
-            value = request.POST.get(f"count_{variety.value}", "0")
-            try:
-                count_data[variety.value] = int(value) if value else 0
-            except ValueError:
-                count_data[variety.value] = 0
-
-        # Create the count event
         event = Event.objects.create(
             family=family,
             event_type=EventType.COUNT,
-            count_data=count_data,
+            count_data=_parse_count_data(request.POST),
         )
 
         return redirect("count_success", event_id=event.pk)
@@ -132,33 +118,10 @@ class CountSuccessView(TemplateView):
             context["event"] = None
             return context
 
-        # Build cookie varieties list with submitted counts
-        varieties = []
-        total = 0
-        for variety_code in COOKIE_POPULARITY.keys():
-            cookie = CookieVariety(variety_code)
-            color = COOKIE_COLORS.get(cookie, "#CCCCCC")
-            hex_color = color.lstrip("#")
-            r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
-            luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-            text_dark = luminance > 0.5
-
-            count = event.count_data.get(variety_code, 0)
-            total += count
-
-            varieties.append(
-                {
-                    "code": variety_code,
-                    "label": cookie.label,
-                    "color": color,
-                    "text_dark": text_dark,
-                    "count": count,
-                }
-            )
-
+        varieties = _build_varieties_list(event.count_data)
         context["event"] = event
         context["varieties"] = varieties
-        context["total"] = total
+        context["total"] = sum(v["count"] for v in varieties)
         return context
 
 
@@ -225,20 +188,10 @@ class AdminEventView(TemplateView):
         if event_type not in (EventType.PICKUP, EventType.RETURN):
             return redirect("admin_event")
 
-        # Collect count data from form
-        count_data = {}
-        for variety in CookieVariety:
-            value = request.POST.get(f"count_{variety.value}", "0")
-            try:
-                count_data[variety.value] = int(value) if value else 0
-            except ValueError:
-                count_data[variety.value] = 0
-
-        # Create the event
         event = Event.objects.create(
             family=family,
             event_type=event_type,
-            count_data=count_data,
+            count_data=_parse_count_data(request.POST),
         )
 
         return redirect("admin_event_success", event_id=event.pk)
@@ -258,15 +211,8 @@ class AdminEventSuccessView(TemplateView):
             context["event"] = None
             return context
 
-        # Build cookie varieties list with submitted counts
-        varieties = _build_varieties_list()
-        total = 0
-        for variety in varieties:
-            count = event.count_data.get(variety["code"], 0)
-            variety["count"] = count
-            total += count
-
+        varieties = _build_varieties_list(event.count_data)
         context["event"] = event
         context["varieties"] = varieties
-        context["total"] = total
+        context["total"] = sum(v["count"] for v in varieties)
         return context
