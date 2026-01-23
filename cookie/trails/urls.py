@@ -1,8 +1,6 @@
 from django.urls import path
 
 from .views import (
-    AdminEventSuccessView,
-    AdminEventView,
     CalculatorView,
     CasesView,
     CountSuccessView,
@@ -10,6 +8,8 @@ from .views import (
     FamilyLoginView,
     FamilyLogoutView,
     HomeView,
+    PickupReturnEventSuccessView,
+    PickupReturnEventView,
 )
 
 urlpatterns = [
@@ -25,10 +25,10 @@ urlpatterns = [
     path("family/login/", FamilyLoginView.as_view(), name="family_login"),
     path("family/logout/", FamilyLogoutView.as_view(), name="family_logout"),
     # Admin-only views (staff_member_required)
-    path("staff/event/", AdminEventView.as_view(), name="admin_event"),
+    path("staff/event/", PickupReturnEventView.as_view(), name="pickup_return_event"),
     path(
         "staff/event/<int:event_id>/success/",
-        AdminEventSuccessView.as_view(),
-        name="admin_event_success",
+        PickupReturnEventSuccessView.as_view(),
+        name="pickup_return_event_success",
     ),
 ]

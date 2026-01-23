@@ -24,7 +24,7 @@ class CookieCountForm(forms.Form):
         }
 
 
-class AdminEventForm(CookieCountForm):
+class PickupReturnEventForm(CookieCountForm):
     """Form for admin to record pickup/return events."""
 
     family = forms.ModelChoiceField(queryset=Family.objects.all())

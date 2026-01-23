@@ -12,7 +12,7 @@ from .family_auth import (
     requires_family,
     set_current_family,
 )
-from .forms import AdminEventForm, CookieCountForm, FamilyLoginForm
+from .forms import CookieCountForm, FamilyLoginForm, PickupReturnEventForm
 from .models import Event, EventType, Family
 
 
@@ -147,8 +147,8 @@ class FamilyLogoutView(View):
 
 
 @method_decorator(staff_member_required, name="dispatch")
-class AdminEventView(TemplateView):
-    template_name = "admin_event.html"
+class PickupReturnEventView(TemplateView):
+    template_name = "pickup_return_event.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -169,14 +169,14 @@ class AdminEventView(TemplateView):
         return context
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        form = AdminEventForm(request.POST)
+        form = PickupReturnEventForm(request.POST)
         if form.is_valid():
             event = Event.objects.create(
                 family=form.cleaned_data["family"],
                 event_type=form.cleaned_data["event_type"],
                 count_data=form.get_count_data(),
             )
-            return redirect("admin_event_success", event_id=event.pk)
+            return redirect("pickup_return_event_success", event_id=event.pk)
 
         # Re-render with errors
         context = self.get_context_data()
@@ -185,8 +185,8 @@ class AdminEventView(TemplateView):
 
 
 @method_decorator(staff_member_required, name="dispatch")
-class AdminEventSuccessView(TemplateView):
-    template_name = "admin_event_success.html"
+class PickupReturnEventSuccessView(TemplateView):
+    template_name = "pickup_return_event_success.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
