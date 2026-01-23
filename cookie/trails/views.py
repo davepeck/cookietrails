@@ -12,6 +12,7 @@ from .family_auth import (
     requires_family,
     set_current_family,
 )
+from .forms import AdminEventForm, CookieCountForm, FamilyLoginForm
 from .models import Event, EventType, Family
 
 
@@ -40,18 +41,6 @@ def _build_varieties_list(
             variety[count_key] = count_data.get(variety_code, 0)
         varieties.append(variety)
     return varieties
-
-
-def _parse_count_data(post_data) -> dict[str, int]:
-    """Parse cookie count data from POST request."""
-    count_data = {}
-    for variety in CookieVariety:
-        value = post_data.get(f"count_{variety.value}", "0")
-        try:
-            count_data[variety.value] = int(value) if value else 0
-        except ValueError:
-            count_data[variety.value] = 0
-    return count_data
 
 
 class HomeView(TemplateView):
@@ -91,13 +80,19 @@ class CountView(TemplateView):
         if not family:
             return redirect("family_login")
 
-        event = Event.objects.create(
-            family=family,
-            event_type=EventType.COUNT,
-            count_data=_parse_count_data(request.POST),
-        )
+        form = CookieCountForm(request.POST)
+        if form.is_valid():
+            event = Event.objects.create(
+                family=family,
+                event_type=EventType.COUNT,
+                count_data=form.get_count_data(),
+            )
+            return redirect("count_success", event_id=event.pk)
 
-        return redirect("count_success", event_id=event.pk)
+        # Re-render with errors (though unlikely with optional int fields)
+        context = self.get_context_data()
+        context["form"] = form
+        return self.render_to_response(context)
 
 
 @method_decorator(requires_family, name="dispatch")
@@ -131,19 +126,18 @@ class FamilyLoginView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["next"] = self.request.GET.get("next", "")
-        context["error"] = self.request.GET.get("error", "")
+        context["form"] = kwargs.get("form", FamilyLoginForm())
         return context
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        email = request.POST.get("email", "").strip().lower()
+        form = FamilyLoginForm(request.POST)
         next_url = request.POST.get("next", "") or "/"
 
-        try:
-            family = Family.objects.get(email__iexact=email)
-            set_current_family(request, family)
+        if form.is_valid():
+            set_current_family(request, form.family)
             return redirect(next_url)
-        except Family.DoesNotExist:
-            return redirect(f"{request.path}?next={next_url}&error=1")
+
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class FamilyLogoutView(View):
@@ -175,26 +169,19 @@ class AdminEventView(TemplateView):
         return context
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        family_id = request.POST.get("family")
-        event_type = request.POST.get("event_type")
+        form = AdminEventForm(request.POST)
+        if form.is_valid():
+            event = Event.objects.create(
+                family=form.cleaned_data["family"],
+                event_type=form.cleaned_data["event_type"],
+                count_data=form.get_count_data(),
+            )
+            return redirect("admin_event_success", event_id=event.pk)
 
-        # Validate family
-        try:
-            family = Family.objects.get(pk=family_id)
-        except (Family.DoesNotExist, ValueError):
-            return redirect("admin_event")
-
-        # Validate event type
-        if event_type not in (EventType.PICKUP, EventType.RETURN):
-            return redirect("admin_event")
-
-        event = Event.objects.create(
-            family=family,
-            event_type=event_type,
-            count_data=_parse_count_data(request.POST),
-        )
-
-        return redirect("admin_event_success", event_id=event.pk)
+        # Re-render with errors
+        context = self.get_context_data()
+        context["form"] = form
+        return self.render_to_response(context)
 
 
 @method_decorator(staff_member_required, name="dispatch")

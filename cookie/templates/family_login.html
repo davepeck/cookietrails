@@ -4,10 +4,8 @@
     <div class="-mt-12 w-full max-w-md px-4">
       <h1 class="text-4xl font-bold text-center">Sign In</h1>
       <p class="mt-4 text-gray-600 text-center">Enter your girl scout email address to continue.</p>
-      {% if error %}
-        <div class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          No family found with using that email address with the girl scouts. Please try again.
-        </div>
+      {% if form.errors %}
+        <div class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{{ form.email.errors.0 }}</div>
       {% endif %}
       <form method="post" class="mt-8">
         {% csrf_token %}

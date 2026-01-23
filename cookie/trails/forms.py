@@ -1,6 +1,53 @@
 from django import forms
 
 from .cookies import COOKIE_COLORS, CookieVariety
+from .models import EventType, Family
+
+
+class CookieCountForm(forms.Form):
+    """Form for submitting cookie counts (used by families)."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for variety in CookieVariety:
+            self.fields[f"count_{variety.value}"] = forms.IntegerField(
+                min_value=0,
+                required=False,
+                initial=0,
+            )
+
+    def get_count_data(self) -> dict[str, int]:
+        """Extract cookie count data from cleaned form data."""
+        return {
+            variety.value: self.cleaned_data.get(f"count_{variety.value}") or 0
+            for variety in CookieVariety
+        }
+
+
+class AdminEventForm(CookieCountForm):
+    """Form for admin to record pickup/return events."""
+
+    family = forms.ModelChoiceField(queryset=Family.objects.all())
+    event_type = forms.ChoiceField(
+        choices=[
+            (EventType.PICKUP, "Pickup (troop → family)"),
+            (EventType.RETURN, "Return (family → troop)"),
+        ]
+    )
+
+
+class FamilyLoginForm(forms.Form):
+    """Form for family email-based login."""
+
+    email = forms.EmailField()
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        try:
+            self.family = Family.objects.get(email__iexact=email)
+        except Family.DoesNotExist:
+            raise forms.ValidationError("Email not found. Please try again.")
+        return email
 
 
 class CookieCountWidget(forms.Widget):
