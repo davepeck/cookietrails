@@ -17,6 +17,8 @@
             Place my initial order
           {% endif %}
         </a>
+        <a href="{% url 'order_helper' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Initial Order Helper</a>
         <a href="{% url 'calculator' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box Calculator</a>
         <a href="{% url 'cases' %}"

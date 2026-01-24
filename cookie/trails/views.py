@@ -64,6 +64,10 @@ class CasesView(TemplateView):
     template_name = "cases.html"
 
 
+class OrderHelperView(TemplateView):
+    template_name = "order_helper.html"
+
+
 @method_decorator(requires_family, name="dispatch")
 class CountView(TemplateView):
     template_name = "count.html"

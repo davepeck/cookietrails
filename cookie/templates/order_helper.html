@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block title %}
+  Initial Order Helper - CookieTrails
+{% endblock title %}
+{% block content %}
+  <div class="min-h-dvh bg-gray-50 py-6 sm:py-12 px-3 sm:px-4">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4 text-center">Initial Order Helper</h1>
+      <p class="text-gray-600 text-center mb-6 text-sm sm:text-base">
+        Add up your cookie needs from different sources, and we'll calculate how many cases to order.
+      </p>
+      <!-- Source Sections -->
+      <div class="space-y-3 sm:space-y-4 mb-6">
+        <!-- Digital Cookie Orders -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <button type="button"
+                  onclick="toggleSection('digital')"
+                  class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition">
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-semibold text-gray-800">Digital Cookie Delivery Orders</span>
+              <span id="digital-badge"
+                    class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">0 boxes</span>
+            </div>
+            <svg id="digital-chevron"
+                 class="w-5 h-5 text-gray-500 transition-transform rotate-180"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="digital-content" class="px-4 pb-4">
+            <p class="text-xs sm:text-sm text-gray-500 mb-3">Orders from Digital Cookie that will be delivered in-person</p>
+            <div id="digital-rows" class="space-y-2"></div>
+          </div>
+        </div>
+        <!-- Paper/Offline Orders -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <button type="button"
+                  onclick="toggleSection('paper')"
+                  class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition">
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-semibold text-gray-800">Paper &amp; Offline Orders</span>
+              <span id="paper-badge"
+                    class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">0 boxes</span>
+            </div>
+            <svg id="paper-chevron"
+                 class="w-5 h-5 text-gray-500 transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="paper-content" class="px-4 pb-4 hidden">
+            <p class="text-xs sm:text-sm text-gray-500 mb-3">Orders collected on paper forms or outside Digital Cookie</p>
+            <div id="paper-rows" class="space-y-2"></div>
+          </div>
+        </div>
+        <!-- Booth/Wagon Stock -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <button type="button"
+                  onclick="toggleSection('booth')"
+                  class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition">
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-semibold text-gray-800">Extra Cookies</span>
+              <span id="booth-badge"
+                    class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">0 boxes</span>
+            </div>
+            <svg id="booth-chevron"
+                 class="w-5 h-5 text-gray-500 transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="booth-content" class="px-4 pb-4 hidden">
+            <p class="text-xs sm:text-sm text-gray-500 mb-3">
+              Extra cookies you'd like for "wagon" sales, lemonade stands, etc. The <a href="{% url 'calculator' %}"
+    class="underline text-blue-500 hover:text-blue-700"
+    target="_blank">box calculator</a> may help.
+            </p>
+            <div id="booth-rows" class="space-y-2"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Results Section -->
+      <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+        <h2 class="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Your Recommended Order</h2>
+        <div id="order-results" class="space-y-2 sm:space-y-3"></div>
+        <div id="order-totals"
+             class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200"></div>
+      </div>
+      <div class="mt-6 text-center">
+        <a href="{% url 'home' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-base sm:text-lg transition">&larr; Back to home</a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+{% block extra_scripts %}
+  <script>
+    // Track which sections are open
+    const sectionState = {
+      digital: true,
+      paper: false,
+      booth: false
+    };
+
+    /**
+     * Determine if a color is light (needs dark text) or dark (needs light text)
+     */
+    function isLightColor(hexColor) {
+      const hex = hexColor.replace("#", "");
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5;
+    }
+
+    /**
+     * Toggle a section's visibility
+     */
+    function toggleSection(section) {
+      sectionState[section] = !sectionState[section];
+      const content = document.getElementById(`${section}-content`);
+      const chevron = document.getElementById(`${section}-chevron`);
+
+      if (sectionState[section]) {
+        content.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+      }
+    }
+
+    /**
+     * Build input rows for a section
+     */
+    function buildSectionRows(section) {
+      const rowsDiv = document.getElementById(`${section}-rows`);
+      let html = "";
+
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const label = getCookieLabel(variety);
+        const shortLabel = getCookieLabelShort(variety);
+        const color = getCookieColor(variety);
+        const textColor = isLightColor(color) ? "text-gray-800" : "text-white";
+
+        html += `
+          <div class="flex items-center gap-2">
+            <div class="w-16 sm:w-28 py-1 sm:py-1.5 px-2 rounded-lg font-medium ${textColor} text-xs sm:text-sm truncate" style="background-color: ${color};">
+              <span class="sm:hidden">${shortLabel}</span>
+              <span class="hidden sm:inline">${label}</span>
+            </div>
+            <input type="number" id="${section}-${variety}" min="0" placeholder="0" class="w-16 sm:w-20 px-2 py-1 sm:py-1.5 text-sm font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" oninput="updateCalculations()" />
+            <span class="text-gray-400 text-xs">boxes</span>
+          </div>
+        `;
+      }
+
+      rowsDiv.innerHTML = html;
+    }
+
+    /**
+     * Get total boxes for a section
+     */
+    function getSectionTotal(section) {
+      let total = 0;
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const input = document.getElementById(`${section}-${variety}`);
+        total += parseInt(input.value) || 0;
+      }
+      return total;
+    }
+
+    /**
+     * Get boxes per variety for a section
+     */
+    function getSectionBoxes(section) {
+      const boxes = {};
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const input = document.getElementById(`${section}-${variety}`);
+        boxes[variety] = parseInt(input.value) || 0;
+      }
+      return boxes;
+    }
+
+    /**
+     * Update all calculations and display
+     */
+    function updateCalculations() {
+      // Update section badges
+      const sections = ['digital', 'paper', 'booth'];
+      for (const section of sections) {
+        const total = getSectionTotal(section);
+        const badge = document.getElementById(`${section}-badge`);
+        badge.textContent = `${total} box${total !== 1 ? 'es' : ''}`;
+        badge.className = total > 0
+          ? 'text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full'
+          : 'text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full';
+      }
+
+      // Calculate totals per variety
+      const totalBoxes = {};
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        totalBoxes[variety] = 0;
+        for (const section of sections) {
+          const input = document.getElementById(`${section}-${variety}`);
+          totalBoxes[variety] += parseInt(input.value) || 0;
+        }
+      }
+
+      // Calculate cases
+      const cases = calculateCases(totalBoxes);
+
+      // Render results
+      const resultsDiv = document.getElementById('order-results');
+      const totalsDiv = document.getElementById('order-totals');
+
+      let totalRequestedBoxes = 0;
+      let totalCases = 0;
+      let totalActualBoxes = 0;
+
+      let html = "";
+      for (const variety of VARIETIES_BY_POPULARITY) {
+        const requestedBoxes = totalBoxes[variety];
+        const numCases = cases[variety];
+        const actualBoxes = numCases * BOXES_PER_CASE;
+        const extraBoxes = actualBoxes - requestedBoxes;
+
+        totalRequestedBoxes += requestedBoxes;
+        totalCases += numCases;
+        totalActualBoxes += actualBoxes;
+
+        const label = getCookieLabel(variety);
+        const shortLabel = getCookieLabelShort(variety);
+        const color = getCookieColor(variety);
+        const textColor = isLightColor(color) ? "text-gray-800" : "text-white";
+
+        // Build extras text
+        let extrasText = "";
+        if (extraBoxes > 0) {
+          extrasText = `<span class="text-green-600 text-xs">+${extraBoxes} extra</span>`;
+        } else if (extraBoxes < 0) {
+          extrasText = `<span class="text-red-600 text-xs">${extraBoxes} fewer</span>`;
+        }
+
+        html += `
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-16 sm:w-28 py-1 sm:py-1.5 px-2 rounded-lg font-medium ${textColor} text-xs sm:text-sm truncate" style="background-color: ${color};">
+              <span class="sm:hidden">${shortLabel}</span>
+              <span class="hidden sm:inline">${label}</span>
+            </div>
+            <div class="w-12 sm:w-16 text-right text-sm text-gray-500">
+              ${requestedBoxes > 0 ? requestedBoxes : '-'}
+            </div>
+            <span class="text-gray-400 text-xs">&rarr;</span>
+            <div class="flex-1 flex items-center gap-1 sm:gap-2">
+              <span class="font-bold text-gray-800 text-sm sm:text-base">${numCases}</span>
+              <span class="text-gray-500 text-xs sm:text-sm">${numCases === 1 ? 'case' : 'cases'}</span>
+              ${numCases > 0 ? `<span class="text-gray-400 text-xs">(${actualBoxes})</span>` : ''}
+              ${extrasText}
+            </div>
+          </div>
+        `;
+      }
+
+      if (totalRequestedBoxes === 0) {
+        html = '<p class="text-gray-500 text-center py-4 text-sm">Enter your box needs above to see your recommended order</p>';
+      }
+
+      resultsDiv.innerHTML = html;
+
+      // Totals
+      const totalExtras = totalActualBoxes - totalRequestedBoxes;
+      const totalCost = calculateCookieCost(
+        Object.fromEntries(
+          VARIETIES_BY_POPULARITY.map((v) => [v, cases[v] * BOXES_PER_CASE])
+        )
+      );
+
+      if (totalRequestedBoxes > 0) {
+        totalsDiv.innerHTML = `
+          <div class="space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-x-6 sm:gap-y-2">
+            <div>
+              <span class="text-gray-600 text-sm">Boxes needed:</span>
+              <span class="text-lg font-bold text-gray-800 ml-1">${totalRequestedBoxes}</span>
+            </div>
+            <div>
+              <span class="text-gray-600 text-sm">Cases to order:</span>
+              <span class="text-lg font-bold text-green-700 ml-1">${totalCases}</span>
+            </div>
+            <div>
+              <span class="text-gray-600 text-sm">Boxes you'll get:</span>
+              <span class="text-lg font-bold text-gray-800 ml-1">${totalActualBoxes}</span>
+              ${totalExtras > 0 ? `<span class="text-green-600 text-sm ml-1">(+${totalExtras} extra)</span>` : totalExtras < 0 ? `<span class="text-red-600 text-sm ml-1">(${totalExtras} fewer)</span>` : ''}
+            </div>
+            <div>
+              <span class="text-gray-600 text-sm">Total value:</span>
+              <span class="text-lg font-bold text-gray-800 ml-1">$${totalCost.toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      } else {
+        totalsDiv.innerHTML = '';
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      buildSectionRows('digital');
+      buildSectionRows('paper');
+      buildSectionRows('booth');
+      updateCalculations();
+    });
+  </script>
+{% endblock extra_scripts %}

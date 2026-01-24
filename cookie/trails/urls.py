@@ -11,6 +11,7 @@ from .views import (
     InitialOrdersCsvView,
     InitialOrderSuccessView,
     InitialOrderView,
+    OrderHelperView,
     PickupReturnEventSuccessView,
     PickupReturnEventView,
 )
@@ -19,6 +20,7 @@ urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("calc/", CalculatorView.as_view(), name="calculator"),
     path("cases/", CasesView.as_view(), name="cases"),
+    path("order-helper/", OrderHelperView.as_view(), name="order_helper"),
     path("events/count/", CountView.as_view(), name="count"),
     path(
         "events/count/<int:event_id>/success/",
