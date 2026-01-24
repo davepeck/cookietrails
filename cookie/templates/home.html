@@ -24,8 +24,7 @@
         {% endif %}
         <a href="{% url 'calculator' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box calculator</a>
-        <a href="{% url 'cases' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Case suggestions</a>
+        <!-- <a href="{% url 'cases' %}" class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Case suggestions</a> -->
         {% if not user.is_staff %}
           <a href="{% url 'admin:login' %}"
              class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Admin access</a>
