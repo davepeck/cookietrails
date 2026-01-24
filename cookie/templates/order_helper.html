@@ -63,7 +63,7 @@
                   onclick="toggleSection('booth')"
                   class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition">
             <div class="flex items-center gap-2">
-              <span class="text-base sm:text-lg font-semibold text-gray-800">Extra Cookies</span>
+              <span class="text-base sm:text-lg font-semibold text-gray-800">Wagon (In-Hand) Cookies</span>
               <span id="booth-badge"
                     class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">0 boxes</span>
             </div>
@@ -77,11 +77,38 @@
           </button>
           <div id="booth-content" class="px-4 pb-4 hidden">
             <p class="text-xs sm:text-sm text-gray-500 mb-3">
-              Extra cookies you'd like for "wagon" sales, lemonade stands, etc. The <a href="{% url 'calculator' %}"
+              Extra cookies you'd like for "wagon" sales, lemonade stands, etc. through the end of February. The <a href="{% url 'calculator' %}"
     class="underline text-blue-500 hover:text-blue-700"
     target="_blank">box calculator</a> may help.
             </p>
             <div id="booth-rows" class="space-y-2"></div>
+          </div>
+        </div>
+        <!-- First Weekend Booths -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+          <button type="button"
+                  onclick="toggleSection('firstweekend')"
+                  class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition">
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-semibold text-gray-800">First Weekend Booths</span>
+              <span id="firstweekend-badge"
+                    class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">0 boxes</span>
+            </div>
+            <svg id="firstweekend-chevron"
+                 class="w-5 h-5 text-gray-500 transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="firstweekend-content" class="px-4 pb-4 hidden">
+            <p class="text-xs sm:text-sm text-gray-500 mb-3">
+              Cookies for the first weekend of booth sales (Thursday February 26th through Sunday March 1st). Slow booths might do 50 boxes. Great booths might do 150. Remember that these cookies can be returned to the troop stash. Also, if you're planning on sharing booths, maybe consider cutting your order here in half so we collectively have about the right number. The <a href="{% url 'calculator' %}"
+    class="underline text-blue-500 hover:text-blue-700"
+    target="_blank">box calculator</a> may help.
+            </p>
+            <div id="firstweekend-rows" class="space-y-2"></div>
           </div>
         </div>
       </div>
@@ -112,7 +139,8 @@
     const sectionState = {
       digital: true,
       paper: false,
-      booth: false
+      booth: false,
+      firstweekend: false
     };
 
     /**
@@ -201,7 +229,7 @@
      */
     function updateCalculations() {
       // Update section badges
-      const sections = ['digital', 'paper', 'booth'];
+      const sections = ['digital', 'paper', 'booth', 'firstweekend'];
       for (const section of sections) {
         const total = getSectionTotal(section);
         const badge = document.getElementById(`${section}-badge`);
@@ -340,6 +368,7 @@
       buildSectionRows('digital');
       buildSectionRows('paper');
       buildSectionRows('booth');
+      buildSectionRows('firstweekend');
       updateCalculations();
     });
   </script>
