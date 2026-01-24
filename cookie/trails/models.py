@@ -25,6 +25,14 @@ class EventType(models.TextChoices):
     # Family reports cookie sales count
     COUNT = "count", "Count"
 
+    # Family requests cookies from the service unit
+    COOKIE_ORDER = "cookie_order", "Cookie Order"
+
+
+class CountUnit(models.TextChoices):
+    BOX = "box", "Box"
+    CASE = "case", "Case"  # 1 case = 12 boxes
+
 
 def _default_count_data() -> dict[str, int]:
     # This *has* to be a named function, not a lambda or just a dict literal,
@@ -40,6 +48,10 @@ class Event(models.Model):
     family = models.ForeignKey(Family, on_delete=models.PROTECT, related_name="events")
     updated_at = models.DateTimeField(auto_now=True)
     count_data = models.JSONField(default=_default_count_data)
+    unit = models.CharField(
+        max_length=10, choices=CountUnit.choices, default=CountUnit.BOX
+    )
+    extra = models.JSONField(default=dict)
 
     class Meta:
         ordering = ["created_at"]

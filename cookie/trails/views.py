@@ -13,7 +13,7 @@ from .family_auth import (
     set_current_family,
 )
 from .forms import CookieCountForm, FamilyLoginForm, PickupReturnEventForm
-from .models import Event, EventType, Family
+from .models import CountUnit, Event, EventType, Family
 
 
 def _build_varieties_list(
@@ -45,6 +45,15 @@ def _build_varieties_list(
 
 class HomeView(TemplateView):
     template_name = "home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        family = get_current_family(self.request)
+        if family:
+            context["has_initial_order"] = Event.objects.filter(
+                family=family, event_type=EventType.COOKIE_ORDER
+            ).exists()
+        return context
 
 
 class CalculatorView(TemplateView):
@@ -108,6 +117,82 @@ class CountSuccessView(TemplateView):
         try:
             event = Event.objects.get(
                 pk=event_id, family=family, event_type=EventType.COUNT
+            )
+        except Event.DoesNotExist:
+            context["event"] = None
+            return context
+
+        varieties = _build_varieties_list(event.count_data)
+        context["event"] = event
+        context["varieties"] = varieties
+        context["total"] = sum(v["count"] for v in varieties)
+        return context
+
+
+@method_decorator(requires_family, name="dispatch")
+class InitialOrderView(TemplateView):
+    template_name = "initial_order.html"
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        family = get_current_family(request)
+        if family:
+            # If family already has an order, redirect to success page
+            existing_order = (
+                Event.objects.filter(family=family, event_type=EventType.COOKIE_ORDER)
+                .order_by("-created_at")
+                .first()
+            )
+            if existing_order:
+                return redirect("initial_order_success", event_id=existing_order.pk)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["varieties"] = _build_varieties_list()
+        return context
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        family = get_current_family(request)
+        if not family:
+            return redirect("family_login")
+
+        form = CookieCountForm(request.POST)
+        if form.is_valid():
+            event = Event.objects.create(
+                family=family,
+                event_type=EventType.COOKIE_ORDER,
+                unit=CountUnit.CASE,
+                count_data=form.get_count_data(),
+            )
+            from django.urls import reverse
+
+            return redirect(
+                reverse("initial_order_success", kwargs={"event_id": event.pk})
+                + "?new=1"
+            )
+
+        # Re-render with errors
+        context = self.get_context_data()
+        context["form"] = form
+        return self.render_to_response(context)
+
+
+@method_decorator(requires_family, name="dispatch")
+class InitialOrderSuccessView(TemplateView):
+    template_name = "initial_order_success.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        family = get_current_family(self.request)
+        event_id = self.kwargs.get("event_id")
+
+        # Check if this is a new submission or viewing a previous one
+        context["is_new_submission"] = self.request.GET.get("new") == "1"
+
+        # Get the event and verify it belongs to this family
+        try:
+            event = Event.objects.get(
+                pk=event_id, family=family, event_type=EventType.COOKIE_ORDER
             )
         except Event.DoesNotExist:
             context["event"] = None
@@ -203,3 +288,44 @@ class PickupReturnEventSuccessView(TemplateView):
         context["varieties"] = varieties
         context["total"] = sum(v["count"] for v in varieties)
         return context
+
+
+@method_decorator(staff_member_required, name="dispatch")
+class InitialOrdersCsvView(View):
+    def get(self, request: HttpRequest) -> HttpResponse:
+        import csv
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="initial_orders.csv"'
+
+        writer = csv.writer(response)
+
+        # Header row
+        variety_codes = list(COOKIE_POPULARITY.keys())
+        header = ["Scout Name", "Email", "Grade", "Order Date"]
+        header.extend(v.value for v in variety_codes)
+        header.append("Total Cases")
+        writer.writerow(header)
+
+        # Build a map of family_id -> order for quick lookup
+        orders = Event.objects.filter(event_type=EventType.COOKIE_ORDER)
+        orders_by_family = {order.family_id: order for order in orders}
+
+        # Data rows - one per family, ordered by scout_name
+        for family in Family.objects.order_by("scout_name"):
+            order = orders_by_family.get(family.pk)
+            row = [
+                family.scout_name,
+                family.email,
+                family.grade,
+                order.created_at.strftime("%Y-%m-%d %H:%M") if order else "",
+            ]
+            total = 0
+            for variety in variety_codes:
+                count = order.count_data.get(variety.value, 0) if order else 0
+                row.append(count)
+                total += count
+            row.append(total)
+            writer.writerow(row)
+
+        return response

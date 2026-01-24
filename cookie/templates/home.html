@@ -5,10 +5,18 @@
       <h1 class="text-4xl font-bold">CookieTrails</h1>
       <div class="mt-8 flex flex-col gap-4">
         <a href="{% url 'count' %}"
-           class="pointer rounded-md bg-blue-600 hover:bg-blue-900 text-white text-xl transition p-4">Report your inventory</a>
+           class="pointer rounded-md bg-blue-600 hover:bg-blue-900 text-white text-xl transition p-4">Report my inventory</a>
       </div>
       <div class="mt-16 flex flex-col gap-4">
         <h3 class="text-xl font-bold text-gray-600">Utilities</h3>
+        <a href="{% url 'initial_order' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">
+          {% if has_initial_order %}
+            See my initial order
+          {% else %}
+            Place my initial order
+          {% endif %}
+        </a>
         <a href="{% url 'calculator' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box Calculator</a>
         <a href="{% url 'cases' %}"
@@ -27,6 +35,8 @@
              class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Families list</a>
           <a href="{% url 'admin:trails_event_changelist' %}"
              class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Events list</a>
+          <a href="{% url 'initial_orders_csv' %}"
+             class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Export initial orders (CSV)</a>
         </div>
       {% endif %}
     </div>

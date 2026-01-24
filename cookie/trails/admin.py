@@ -2,7 +2,6 @@ from typing import Any
 
 from django.contrib import admin
 from django.contrib.admin.decorators import display
-from django.db import models
 from django.http import HttpRequest
 
 from cookie.admin import admin_site
@@ -56,9 +55,10 @@ class EventAdmin(admin.ModelAdmin):
     search_help_text = "Search by scout name or parent email"
     # list_filter = ["event_type"]
 
-    formfield_overrides = {
-        models.JSONField: {"widget": CookieCountWidget},
-    }
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == "count_data":
+            kwargs["widget"] = CookieCountWidget
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def changelist_view(self, request: HttpRequest, extra_context: dict | None = None):
         extra_context = extra_context or {}

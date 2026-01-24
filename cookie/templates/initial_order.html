@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block title %}
-  Report Inventory - CookieTrails
+  Submit Initial Order - CookieTrails
 {% endblock title %}
 {% block content %}
   <div class="min-h-dvh bg-gray-50 py-6 sm:py-12 px-3 sm:px-4">
     <div class="max-w-2xl mx-auto">
-      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Report My Inventory</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">Submit Initial Order</h1>
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
         <p class="text-gray-700 text-sm sm:text-base">
           Signed in as <span class="font-semibold">{{ current_family.scout_name }}</span>
@@ -15,15 +15,17 @@
            class="text-sm underline text-blue-500 hover:text-blue-900 transition">Sign out</a>
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
-        <p class="text-gray-600 text-sm sm:text-base mb-4">Count the boxes you have at home right now:</p>
+        <p class="text-gray-600 text-sm sm:text-base mb-4">
+          Enter the number of <b>COOKIE CASES</b> (12 boxes) you want to order:
+        </p>
         {% if has_previous %}
           <button type="button"
                   onclick="fillPrevious()"
                   class="mb-4 px-4 py-2 text-sm bg-gray-200 hover:bg-gray-400 text-gray-700 rounded-lg transition border border-gray-500">
-            No change since last report
+            No change since last order
           </button>
         {% endif %}
-        <form method="post" id="count-form">
+        <form method="post" id="order-form">
           {% csrf_token %}
           <div class="space-y-2 sm:space-y-3">
             {% for variety in varieties %}
@@ -45,20 +47,20 @@
                        placeholder="0"
                        data-last-value="{{ variety.last_value }}"
                        class="w-20 sm:w-24 px-2 py-1.5 sm:py-2 text-sm sm:text-base font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                <span class="text-gray-400 text-xs sm:text-sm">boxes</span>
+                <span class="text-gray-400 text-xs sm:text-sm">cases</span>
               </div>
             {% endfor %}
           </div>
           <div id="total-display"
                class="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
             <div class="flex justify-between items-center">
-              <span class="text-gray-600">Total boxes:</span>
+              <span class="text-gray-600">Total cases:</span>
               <span id="total-count" class="text-xl font-bold text-gray-800">0</span>
             </div>
           </div>
           <button type="submit"
                   class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white text-lg sm:text-xl font-semibold transition p-3 sm:p-4 rounded-lg">
-            Submit Inventory
+            Submit Order
           </button>
         </form>
       </div>
@@ -72,7 +74,7 @@
 {% block extra_scripts %}
   <script>
     function updateTotal() {
-      const inputs = document.querySelectorAll('#count-form input[type="number"]');
+      const inputs = document.querySelectorAll('#order-form input[type="number"]');
       let total = 0;
       inputs.forEach(input => {
         total += parseInt(input.value) || 0;
@@ -81,7 +83,7 @@
     }
 
     function fillPrevious() {
-      const inputs = document.querySelectorAll('#count-form input[type="number"]');
+      const inputs = document.querySelectorAll('#order-form input[type="number"]');
       inputs.forEach(input => {
         const lastValue = input.getAttribute('data-last-value');
         if (lastValue) {
@@ -92,7 +94,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const inputs = document.querySelectorAll('#count-form input[type="number"]');
+      const inputs = document.querySelectorAll('#order-form input[type="number"]');
       inputs.forEach(input => {
         input.addEventListener('input', updateTotal);
       });
