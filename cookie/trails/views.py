@@ -156,17 +156,29 @@ class InitialOrderView(TemplateView):
         return context
 
     def post(self, request: HttpRequest) -> HttpResponse:
+        import json
+
         family = get_current_family(request)
         if not family:
             return redirect("family_login")
 
         form = CookieCountForm(request.POST)
         if form.is_valid():
+            # Parse box breakdown from helper if provided
+            extra_data: dict = {}
+            box_breakdown_json = request.POST.get("box_breakdown")
+            if box_breakdown_json:
+                try:
+                    extra_data["box_breakdown"] = json.loads(box_breakdown_json)
+                except json.JSONDecodeError:
+                    pass  # Ignore malformed JSON
+
             event = Event.objects.create(
                 family=family,
                 event_type=EventType.COOKIE_ORDER,
                 unit=CountUnit.CASE,
                 count_data=form.get_count_data(),
+                extra=extra_data,
             )
             from django.urls import reverse
 

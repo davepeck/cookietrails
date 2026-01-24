@@ -17,7 +17,8 @@
       <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
         <p class="text-gray-600 text-sm sm:text-base mb-4">
           Enter the number of cookie <b>CASES</b> (12 boxes) you want to order.
-          <a href="{% url 'order_helper' %}"
+          <a id="help-link"
+             href="{% url 'order_helper' %}"
              class="underline text-blue-500 hover:text-blue-900 transition">Need help deciding</a>?
         </p>
         {% if has_previous %}
@@ -66,15 +67,22 @@
           </button>
         </form>
       </div>
-      <div class="mt-6 text-center">
+      <div class="mt-6 text-center space-x-4">
         <a href="{% url 'home' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-base sm:text-lg transition">&larr; Back to home</a>
+        <a id="helper-link"
+           href="{% url 'order_helper' %}"
+           class="pointer underline text-blue-500 hover:text-blue-900 text-base sm:text-lg transition">Initial order helper</a>
       </div>
     </div>
   </div>
 {% endblock content %}
 {% block extra_scripts %}
   <script>
+    // Store helper context from query params
+    const helperContext = {};
+    const sections = ['digital', 'paper', 'booth', 'firstweekend'];
+
     function updateTotal() {
       const inputs = document.querySelectorAll('#order-form input[type="number"]');
       let total = 0;
@@ -98,11 +106,62 @@
     function fillFromQueryParams() {
       const params = new URLSearchParams(window.location.search);
       params.forEach((value, key) => {
+        // Fill case count inputs (variety codes like TMint, Sam, etc.)
         const input = document.getElementById(`count_${key}`);
         if (input && value) {
           input.value = value;
         }
+        // Store helper context (section_variety params like digital_TMint)
+        if (key.includes('_')) {
+          helperContext[key] = value;
+        }
       });
+    }
+
+    function getHelperQueryString() {
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(helperContext)) {
+        params.set(key, value);
+      }
+      return params.toString();
+    }
+
+    function updateHelperLinks() {
+      const queryString = getHelperQueryString();
+      const helpLink = document.getElementById('help-link');
+      const helperLink = document.getElementById('helper-link');
+      const baseUrl = '{% url "order_helper" %}';
+
+      if (queryString) {
+        helpLink.href = `${baseUrl}?${queryString}`;
+        helperLink.href = `${baseUrl}?${queryString}`;
+      }
+    }
+
+    function addBoxBreakdownToForm() {
+      // Only add if we have helper context
+      if (Object.keys(helperContext).length === 0) return;
+
+      const form = document.getElementById('order-form');
+
+      // Build box breakdown object grouped by section
+      const boxBreakdown = {};
+      for (const section of sections) {
+        boxBreakdown[section] = {};
+      }
+      for (const [key, value] of Object.entries(helperContext)) {
+        const [section, variety] = key.split('_');
+        if (sections.includes(section) && variety) {
+          boxBreakdown[section][variety] = parseInt(value) || 0;
+        }
+      }
+
+      // Add as hidden input
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'box_breakdown';
+      hiddenInput.value = JSON.stringify(boxBreakdown);
+      form.appendChild(hiddenInput);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -112,6 +171,8 @@
       });
       fillFromQueryParams();
       updateTotal();
+      updateHelperLinks();
+      addBoxBreakdownToForm();
     });
   </script>
 {% endblock extra_scripts %}

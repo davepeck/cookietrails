@@ -351,9 +351,20 @@
       // Show button and build URL if there are cases to order
       if (totalCases > 0) {
         const params = new URLSearchParams();
+        // Add case counts (for pre-filling the order form)
         for (const variety of VARIETIES_BY_POPULARITY) {
           if (cases[variety] > 0) {
             params.set(variety, cases[variety]);
+          }
+        }
+        // Add all box counts from each section (for context preservation)
+        for (const section of sections) {
+          for (const variety of VARIETIES_BY_POPULARITY) {
+            const input = document.getElementById(`${section}-${variety}`);
+            const value = parseInt(input.value) || 0;
+            if (value > 0) {
+              params.set(`${section}_${variety}`, value);
+            }
           }
         }
         useNumbersLink.href = `{% url 'initial_order' %}?${params.toString()}`;
@@ -363,12 +374,53 @@
       }
     }
 
+    /**
+     * Build query string with current helper state (for links back to helper)
+     */
+    function getHelperQueryString() {
+      const sections = ['digital', 'paper', 'booth', 'firstweekend'];
+      const params = new URLSearchParams();
+      for (const section of sections) {
+        for (const variety of VARIETIES_BY_POPULARITY) {
+          const input = document.getElementById(`${section}-${variety}`);
+          if (input) {
+            const value = parseInt(input.value) || 0;
+            if (value > 0) {
+              params.set(`${section}_${variety}`, value);
+            }
+          }
+        }
+      }
+      return params.toString();
+    }
+
+    /**
+     * Restore input values from query params (when returning from initial order page)
+     */
+    function restoreFromQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      const sections = ['digital', 'paper', 'booth', 'firstweekend'];
+      for (const section of sections) {
+        for (const variety of VARIETIES_BY_POPULARITY) {
+          const paramKey = `${section}_${variety}`;
+          const value = params.get(paramKey);
+          if (value) {
+            const input = document.getElementById(`${section}-${variety}`);
+            if (input) {
+              input.value = value;
+            }
+          }
+        }
+      }
+    }
+
     // Initialize on page load
     document.addEventListener("DOMContentLoaded", () => {
       buildSectionRows('digital');
       buildSectionRows('paper');
       buildSectionRows('booth');
       buildSectionRows('firstweekend');
+      restoreFromQueryParams();
       updateCalculations();
     });
   </script>
