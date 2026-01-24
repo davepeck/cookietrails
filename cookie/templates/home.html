@@ -18,9 +18,10 @@
         {% if has_initial_order %}
           <a href="{% url 'initial_order' %}"
              class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">See my initial order</a>
+        {% else %}
+          <a href="{% url 'order_helper' %}"
+             class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Initial order helper</a>
         {% endif %}
-        <a href="{% url 'order_helper' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Initial order helper</a>
         <a href="{% url 'calculator' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box calculator</a>
         <a href="{% url 'cases' %}"
