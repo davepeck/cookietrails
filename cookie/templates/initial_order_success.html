@@ -16,10 +16,10 @@
         </div>
         {% if is_new_submission %}
           <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Order Submitted!</h1>
-          <p class="text-gray-600 mt-2">Thank you, {{ current_family.scout_name }}.</p>
+          <p class="text-gray-600 mt-2">Thank you, {{ current_family.email }}.</p>
         {% else %}
           <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Order Already Submitted</h1>
-          <p class="text-gray-600 mt-2">{{ current_family.scout_name }}, you previously submitted this order.</p>
+          <p class="text-gray-600 mt-2">{{ current_family.email }}, you previously submitted this order.</p>
         {% endif %}
       </div>
       {% if event %}

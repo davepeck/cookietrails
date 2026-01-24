@@ -325,7 +325,7 @@ class InitialOrdersCsvView(View):
 
         # Build a map of family_id -> order for quick lookup
         orders = Event.objects.filter(event_type=EventType.COOKIE_ORDER)
-        orders_by_family = {order.family_id: order for order in orders}
+        orders_by_family = {order.family.pk: order for order in orders}
 
         # Data rows - one per family, ordered by scout_name
         for family in Family.objects.order_by("scout_name"):
