@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="h-dvh flex flex-col items-center justify-center">
-    <div class="-mt-12">
+  <div class="flex flex-col items-center justify-center py-20">
+    <div>
       <h1 class="text-4xl font-bold">CookieTrails</h1>
       <div class="mt-8 flex flex-col gap-4">
         <a href="{% url 'count' %}"
            class="pointer rounded-md bg-blue-600 hover:bg-blue-900 text-white text-xl transition p-4">Report my inventory</a>
-      </div>
-      <div class="mt-16 flex flex-col gap-4">
-        <h3 class="text-xl font-bold text-gray-600">Utilities</h3>
         <a href="{% url 'initial_order' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">
+           class="pointer rounded-md bg-green-600 hover:bg-green-900 text-white text-xl transition p-4">
           {% if has_initial_order %}
             See my initial order
           {% else %}
             Place my initial order
           {% endif %}
         </a>
+      </div>
+      <div class="mt-16 flex flex-col gap-4">
+        <h3 class="text-xl font-bold text-gray-600">Utilities</h3>
         <a href="{% url 'order_helper' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Initial Order Helper</a>
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Initial order helper</a>
         <a href="{% url 'calculator' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box Calculator</a>
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Box calculator</a>
         <a href="{% url 'cases' %}"
-           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Case Suggestions</a>
+           class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Case suggestions</a>
         {% if not user.is_staff %}
           <a href="{% url 'admin:login' %}"
              class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Admin access</a>

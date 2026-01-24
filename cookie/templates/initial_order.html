@@ -16,7 +16,9 @@
       </div>
       <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
         <p class="text-gray-600 text-sm sm:text-base mb-4">
-          Enter the number of <b>COOKIE CASES</b> (12 boxes) you want to order:
+          Enter the number of cookie <b>CASES</b> (12 boxes) you want to order.
+          <a href="{% url 'order_helper' %}"
+             class="underline text-blue-500 hover:text-blue-900 transition">Need help deciding</a>?
         </p>
         {% if has_previous %}
           <button type="button"
@@ -93,11 +95,22 @@
       updateTotal();
     }
 
+    function fillFromQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      params.forEach((value, key) => {
+        const input = document.getElementById(`count_${key}`);
+        if (input && value) {
+          input.value = value;
+        }
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       const inputs = document.querySelectorAll('#order-form input[type="number"]');
       inputs.forEach(input => {
         input.addEventListener('input', updateTotal);
       });
+      fillFromQueryParams();
       updateTotal();
     });
   </script>
