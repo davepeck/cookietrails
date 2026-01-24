@@ -4,19 +4,21 @@
     <div>
       <h1 class="text-4xl font-bold">CookieTrails</h1>
       <div class="mt-8 flex flex-col gap-4">
+        {% if not has_initial_order %}
+          <a href="{% url 'initial_order' %}"
+             class="pointer rounded-md bg-green-600 hover:bg-green-900 text-white text-xl transition p-4">
+            Place my initial order
+          </a>
+        {% endif %}
         <a href="{% url 'count' %}"
            class="pointer rounded-md bg-blue-600 hover:bg-blue-900 text-white text-xl transition p-4">Report my inventory</a>
-        <a href="{% url 'initial_order' %}"
-           class="pointer rounded-md bg-green-600 hover:bg-green-900 text-white text-xl transition p-4">
-          {% if has_initial_order %}
-            See my initial order
-          {% else %}
-            Place my initial order
-          {% endif %}
-        </a>
       </div>
       <div class="mt-16 flex flex-col gap-4">
         <h3 class="text-xl font-bold text-gray-600">Utilities</h3>
+        {% if has_initial_order %}
+          <a href="{% url 'initial_order' %}"
+             class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">See my initial order</a>
+        {% endif %}
         <a href="{% url 'order_helper' %}"
            class="pointer underline text-blue-500 hover:text-blue-900 text-lg transition">Initial order helper</a>
         <a href="{% url 'calculator' %}"
